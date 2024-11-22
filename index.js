@@ -18,10 +18,7 @@ const api = process.env.API_KEY;
 
 // Connect to MongoDB
 mongoose
-  .connect(mongoUri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(mongoUri, {})
   .then(() => {
     console.log("Connected to MongoDB");
     initializeRules();
@@ -45,7 +42,7 @@ async function initializeRules() {
 // Initialize Telegram bot using webhooks
 const bot = new TelegramBot(token);
 const webhookPath = `/bot${token}`;
-const webhookUrl = `${process.env.WEBHOOK_URL}${webhookPath}`;
+const webhookUrl = `${process.env.WEBHOOK_URL}/${webhookPath}`;
 bot.setWebHook(webhookUrl);
 
 // Telegram bot handlers
