@@ -1,7 +1,38 @@
+require("dotenv").config();
 const TelegramBot = require("node-telegram-bot-api");
+const mongoose = require("mongoose");
+const User = require("./models/User");
+const Rules = require("./models/Rules");
 
-const token = "7625992899:AAHxY5jM20SVTn5oXMvKtLcnjSvD1kze_ZU";
+const token = process.env.BOT_TOKEN;
+const mongoUri = process.env.MONGO_URI;
+const api = process.env.API_KEY;
+
 const bot = new TelegramBot(token, { polling: true });
+
+mongoose
+  .connect("mongodb://localhost:27017/telegramBotDB", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log("Connected to MongoDB");
+    initializeRules();
+  })
+  .catch((error) => {
+    console.error("Couldn't connect to MongoDB");
+  });
+
+async function initializeRules() {
+  const existingRules = await Rules.findOne();
+  if (!existingRules) {
+    await Rules.create({
+      offensiveWords: ["spam", "scam", "fake"],
+      spamLimit: 5,
+    });
+    console.log("Default rules created");
+  }
+}
 
 bot.on("message", async (msg) => {
   if (msg.new_chat_member) {
@@ -103,7 +134,7 @@ bot.onText(/\news (.+)/, async (msg) => {
     const response = await axios.get("https://newsapi.org/v2/top-headlines", {
       params: {
         country: "us",
-        apiKey: "ea66ddcee7c2405a94d6e768b184fd09",
+        apiKey: api,
       },
     });
     const articles = response.data.articles.slice(0, 3);
