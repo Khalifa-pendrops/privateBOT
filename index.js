@@ -3,6 +3,7 @@ const TelegramBot = require("node-telegram-bot-api");
 const mongoose = require("mongoose");
 const User = require("./models/User");
 const Rules = require("./models/Rules");
+const scheduleJob = require("node-schedule");
 
 const token = process.env.BOT_TOKEN;
 const mongoUri = process.env.MONGO_URI;
@@ -104,6 +105,7 @@ bot.onText(/\update (.+)/, async (msg, match) => {
 });
 
 scheduleJob.scheduleJob("1 2 * * *", () => {
+  console.log("Scheduled job is running!");
   const groupId = "https://t.me/DARN_Discussion_Space";
   bot.sendMessage(
     groupId,
